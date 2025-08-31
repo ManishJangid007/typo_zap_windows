@@ -1,0 +1,84 @@
+<Window x:Class="TypoZap.ApiKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gemini API Key Required"
+        Height="250"
+        Width="450"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Title -->
+        <TextBlock Grid.Row="0" 
+                   Text="Please enter your Gemini API key"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,10"/>
+        
+        <!-- Help text -->
+        <TextBlock Grid.Row="1" 
+                   Text="You can get one from https://ai.google.dev/gemini-api"
+                   FontSize="12"
+                   Foreground="Gray"
+                   HorizontalAlignment="Center"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,20"/>
+        
+        <!-- API Key input -->
+        <TextBox x:Name="ApiKeyTextBox"
+                 Grid.Row="2"
+                 Height="32"
+                 FontSize="14"
+                 VerticalContentAlignment="Center"
+                 Margin="0,0,0,20"
+                 Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,20">
+            
+            <Button x:Name="PasteButton"
+                    Content="Paste Key"
+                    Width="80"
+                    Height="32"
+                    Margin="0,0,10,0"
+                    Click="PasteButton_Click"/>
+            
+            <Button x:Name="SaveButton"
+                    Content="Save"
+                    Width="80"
+                    Height="32"
+                    Margin="0,0,10,0"
+                    IsDefault="True"
+                    Click="SaveButton_Click"/>
+            
+            <Button x:Name="CancelButton"
+                    Content="Cancel"
+                    Width="80"
+                    Height="32"
+                    IsCancel="True"
+                    Click="CancelButton_Click"/>
+        </StackPanel>
+        
+        <!-- Status message -->
+        <TextBlock x:Name="StatusTextBlock"
+                   Grid.Row="4"
+                   Text=""
+                   FontSize="12"
+                   Foreground="Blue"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>

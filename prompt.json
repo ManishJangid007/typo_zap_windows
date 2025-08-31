@@ -1,0 +1,38 @@
+{
+    "project_name": "TypoZap",
+    "platform": "Windows",
+    "language": "C#",
+    "framework": ".NET 8 (WPF)",
+    "description": "A Windows utility app that lives in the system tray and lets users fix grammar errors instantly using Gemini API by selecting text and pressing Ctrl+Shift+O. The fixed text should automatically replace the selected text with minimal delay.",
+    "steps": [
+        "1. Create a new WPF project in Visual Studio named TypoZap.",
+        "2. Implement a hidden window with a system tray icon (NotifyIcon). The app should run in the background without showing a main window unless user opens settings.",
+        "3. Capture global hotkey Ctrl+Shift+O using Windows API (RegisterHotKey).",
+        "4. When hotkey is pressed, get the currently selected text (use Windows Clipboard: simulate Ctrl+C, read text).",
+        "5. Call Gemini API to correct grammar using the selected text. Refer to official Gemini API quickstart: https://ai.google.dev/gemini-api/docs/quickstart",
+        "6. Parse the Gemini response and copy the corrected text to clipboard.",
+        "7. Simulate Ctrl+V to paste the corrected text back into the original field.",
+        "8. Show a small notification or tooltip near the system tray with a minimal origami-style icon when replacement is complete (use the icon you designed).",
+        "9. Add a settings window (openable from tray menu) that allows users to change hotkey, enable/disable notifications, and set API key securely (store in Windows Credential Manager or encrypted config file).",
+        "10. Add a loader animation icon when Gemini API request is in progress (small spinner near tray icon).",
+        "11. Build in Release mode and test on multiple text fields (Word, Notepad, Chrome input box) to ensure text replacement works fast and reliably.",
+        "12. Sign the executable with a code signing certificate (optional but recommended for trust).",
+        "13. Package the app using MSIX or Inno Setup for easy installation."
+    ],
+    "considerations": [
+        "Ensure fast clipboard read/write and minimal UI delays.",
+        "Handle edge cases: no text selected, large text selection, API failure (show error message).",
+        "Keep network call async to avoid UI freezing.",
+        "Use minimal memory footprint; keep process lightweight since it's always running.",
+        "Ask user for Gemini API key on first launch and store it securely.",
+        "Follow Windows UX guidelines for tray apps (exit, settings, about menu items)."
+    ],
+    "deliverables": [
+        "WPF application with tray icon",
+        "Global hotkey listener (default Ctrl+Shift+O)",
+        "Clipboard integration",
+        "Gemini API integration",
+        "Custom icons for idle, loading, and success states",
+        "Installer package for easy distribution"
+    ]
+}
