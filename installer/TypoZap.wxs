@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" 
+           Name="TypoZap" 
+           Language="1033" 
+           Version="1.0.0.0" 
+           Manufacturer="TypoZap" 
+           UpgradeCode="12345678-1234-1234-1234-123456789012">
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="TypoZap - AI Grammar Correction Tool"
+             Comments="Instant grammar correction using AI"
+             Manufacturer="TypoZap" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="TypoZap" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="ApplicationRegistryKeys" />
+    </Feature>
+
+    <!-- UI Configuration -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir" />
+    
+    <!-- Custom License -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    
+    <!-- Custom Images -->
+    <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+
+    <!-- Installation Directory -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="TypoZap" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="TypoZap" />
+      </Directory>
+      <Directory Id="StartupFolder" />
+    </Directory>
+
+    <!-- Application Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Main Executable -->
+      <Component Id="TypoZapExecutable" Guid="*">
+        <File Id="TypoZapEXE" 
+              Source="$(var.SourceDir)\TypoZap.exe" 
+              KeyPath="yes" 
+              Checksum="yes" />
+      </Component>
+      
+      <!-- Configuration Files -->
+      <Component Id="ConfigFiles" Guid="*">
+        <File Id="ReadmeFile" Source="$(var.SourceDir)\README.md" />
+        <File Id="IconUsageFile" Source="$(var.SourceDir)\ICON_USAGE.md" />
+      </Component>
+      
+      <!-- Assets Directory -->
+      <Component Id="AssetsComponent" Guid="*">
+        <CreateFolder />
+        <File Id="MainIcon" Source="$(var.SourceDir)\Assets\typozap.ico" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Desktop and Start Menu Shortcuts -->
+    <Component Id="ApplicationShortcut" Directory="ApplicationProgramsFolder" Guid="*">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="TypoZap"
+                Description="AI Grammar Correction Tool"
+                Target="[INSTALLFOLDER]TypoZap.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="TypoZap.ico" />
+      
+      <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" 
+                     Key="Software\TypoZap" 
+                     Name="installed" 
+                     Type="integer" 
+                     Value="1" 
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- Registry Keys -->
+    <Component Id="ApplicationRegistryKeys" Directory="INSTALLFOLDER" Guid="*">
+      <RegistryKey Root="HKLM" Key="Software\TypoZap">
+        <RegistryValue Name="InstallLocation" Type="string" Value="[INSTALLFOLDER]" />
+        <RegistryValue Name="Version" Type="string" Value="1.0.0" />
+      </RegistryKey>
+      <RegistryValue Root="HKLM" 
+                     Key="Software\TypoZap" 
+                     Name="installed" 
+                     Type="integer" 
+                     Value="1" 
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- Icon for Control Panel -->
+    <Icon Id="TypoZap.ico" SourceFile="$(var.SourceDir)\Assets\typozap.ico" />
+    <Property Id="ARPPRODUCTICON" Value="TypoZap.ico" />
+    
+    <!-- Control Panel Properties -->
+    <Property Id="ARPHELPLINK" Value="https://github.com/yourusername/typo-zap" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/yourusername/typo-zap" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    
+    <!-- Custom Actions for Clean Installation -->
+    <CustomAction Id="CleanupOnInstall" 
+                  BinaryKey="CleanupBinary" 
+                  DllEntry="CleanupPreviousInstall" 
+                  Execute="immediate" />
+    
+  </Product>
+</Wix>
