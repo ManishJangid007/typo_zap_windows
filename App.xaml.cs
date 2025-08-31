@@ -51,7 +51,7 @@ namespace TypoZap
                 }
 
                 // Show startup notification
-                ShowNotification("TypoZap Started", "Press Ctrl+Shift+O to correct text", WinForms.ToolTipIcon.Info);
+                ShowNotification("TypoZap Started", "1. Select and copy text (Ctrl+C)\n2. Press Ctrl+Shift+O\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
@@ -145,85 +145,99 @@ namespace TypoZap
                 // Change icon to loading state
                 ChangeTrayIcon("loader.ico");
 
-                // Simulate Ctrl+C to copy selected text
-                Console.WriteLine("📋 Simulating Ctrl+C to copy selected text...");
-                _clipboardManager?.SimulateCopy();
-
-                // Wait longer for clipboard to update and stabilize
-                Console.WriteLine("⏳ Waiting for clipboard to update...");
-                await System.Threading.Tasks.Task.Delay(300);
-
-                // Get selected text from clipboard
+                // Step 1: Get selected text from clipboard (user should have already copied it)
+                Console.WriteLine("📋 Getting text from clipboard...");
                 var selectedText = _clipboardManager?.GetClipboardText();
-                Console.WriteLine($"📋 Retrieved text from clipboard: '{selectedText}'");
+                Console.WriteLine($"📋 Clipboard contains: '{selectedText}'");
 
                 if (string.IsNullOrWhiteSpace(selectedText))
                 {
-                    ShowNotification("No Text Selected", "Please select some text to correct.", WinForms.ToolTipIcon.Warning);
+                    var result = WinForms.MessageBox.Show(
+                        "No text found in clipboard.\n\nPlease select and copy (Ctrl+C) the text you want to correct first, then press Ctrl+Shift+O again.",
+                        "No Text Found",
+                        WinForms.MessageBoxButtons.OK,
+                        WinForms.MessageBoxIcon.Warning);
                     ChangeTrayIcon("typozap.ico");
                     return;
                 }
 
-                // Check if we have a valid API key
+                // Step 2: Check if we have a valid API key
                 if (!_geminiService?.HasValidApiKey() == true)
                 {
-                    ShowNotification("API Key Required", "Please set your Gemini API key first.", WinForms.ToolTipIcon.Warning);
+                    var result = WinForms.MessageBox.Show(
+                        "No Gemini API key found.\n\nPlease set your API key first.",
+                        "API Key Required",
+                        WinForms.MessageBoxButtons.OK,
+                        WinForms.MessageBoxIcon.Warning);
                     ChangeTrayIcon("typozap.ico");
                     return;
                 }
 
-                // Send to Gemini for correction
+                // Step 3: Send to Gemini for correction
                 Console.WriteLine("🤖 Sending text to Gemini for correction...");
+                Console.WriteLine($"🤖 Text being sent: '{selectedText}'");
+                
                 var correctedText = await _geminiService?.CorrectGrammarAsync(selectedText);
-
                 Console.WriteLine($"🤖 Gemini response: '{correctedText}'");
 
-                if (!string.IsNullOrEmpty(correctedText))
+                if (string.IsNullOrEmpty(correctedText))
                 {
-                    // Copy corrected text to clipboard
-                    Console.WriteLine("📋 Copying corrected text to clipboard...");
-                    _clipboardManager?.SetClipboardText(correctedText);
+                    var result = WinForms.MessageBox.Show(
+                        "Gemini API returned empty response.\n\nPlease check your API key and try again.",
+                        "API Response Error",
+                        WinForms.MessageBoxButtons.OK,
+                        WinForms.MessageBoxIcon.Error);
+                    ChangeTrayIcon("typozap.ico");
+                    return;
+                }
 
-                    // Wait longer for clipboard to update
-                    Console.WriteLine("⏳ Waiting for clipboard to update with corrected text...");
-                    await System.Threading.Tasks.Task.Delay(300);
-                    
-                    // Verify the corrected text is in clipboard
-                    var clipboardText = _clipboardManager?.GetClipboardText();
-                    Console.WriteLine($"📋 Clipboard now contains: '{clipboardText}'");
-                    
-                    if (clipboardText == correctedText)
-                    {
-                        // Simulate Ctrl+V to paste corrected text
-                        Console.WriteLine("📋 Simulating Ctrl+V to paste corrected text...");
-                        _clipboardManager?.SimulatePaste();
+                // Step 4: Automatically apply the correction
+                Console.WriteLine("📋 Applying correction automatically...");
+                
+                // Step 5: Copy corrected text to clipboard
+                Console.WriteLine("📋 Copying corrected text to clipboard...");
+                _clipboardManager?.SetClipboardText(correctedText);
 
-                        // Show success feedback
-                        ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
-                        ChangeTrayIcon("completed.ico");
+                // Step 6: Wait a moment and verify clipboard
+                await System.Threading.Tasks.Task.Delay(200);
+                var clipboardText = _clipboardManager?.GetClipboardText();
+                Console.WriteLine($"📋 Clipboard now contains: '{clipboardText}'");
 
-                        // Restore normal icon after delay
-                        await System.Threading.Tasks.Task.Delay(1000);
-                        ChangeTrayIcon("typozap.ico");
-                    }
-                    else
-                    {
-                        Console.WriteLine("❌ Clipboard content mismatch - corrected text not properly set");
-                        ShowNotification("Clipboard Error", "Failed to set corrected text in clipboard.", WinForms.ToolTipIcon.Error);
-                        ChangeTrayIcon("typozap.ico");
-                    }
+                if (clipboardText == correctedText)
+                {
+                    // Step 7: Simulate Ctrl+V to paste corrected text
+                    Console.WriteLine("📋 Simulating Ctrl+V to paste corrected text...");
+                    _clipboardManager?.SimulatePaste();
+
+                    // Show success feedback
+                    ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
+                    ChangeTrayIcon("completed.ico");
+
+                    // Restore normal icon after delay
+                    await System.Threading.Tasks.Task.Delay(1000);
+                    ChangeTrayIcon("typozap.ico");
                 }
                 else
                 {
-                    Console.WriteLine("❌ Gemini returned empty or null corrected text");
-                    ShowNotification("Correction Failed", "Failed to get corrected text from Gemini API.", WinForms.ToolTipIcon.Error);
+                    var errorResult = WinForms.MessageBox.Show(
+                        $"Clipboard verification failed.\n\nExpected: {correctedText}\nActual: {clipboardText}\n\nThis indicates a clipboard issue.",
+                        "Clipboard Error",
+                        WinForms.MessageBoxButtons.OK,
+                        WinForms.MessageBoxIcon.Error);
                     ChangeTrayIcon("typozap.ico");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Error in ProcessHotkeyAction: {ex.Message}");
-                ShowNotification("Error", $"Failed to process hotkey: {ex.Message}", WinForms.ToolTipIcon.Error);
+                Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                
+                var errorResult = WinForms.MessageBox.Show(
+                    $"An error occurred during text correction:\n\n{ex.Message}\n\nStack trace:\n{ex.StackTrace}",
+                    "Error",
+                    WinForms.MessageBoxButtons.OK,
+                    WinForms.MessageBoxIcon.Error);
+                
                 ChangeTrayIcon("typozap.ico");
             }
         }
