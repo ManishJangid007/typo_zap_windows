@@ -81,6 +81,41 @@ namespace TypoZap
             }
         }
         
+        public void SimulateCopyWithDelay()
+        {
+            try
+            {
+                Console.WriteLine("📋 Simulating Ctrl+C with longer key press (Teams/Electron app fallback)...");
+                
+                // Press and hold Ctrl
+                keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYDOWN, IntPtr.Zero);
+                
+                // Small delay to ensure Ctrl is registered
+                System.Threading.Thread.Sleep(50);
+                
+                // Press C
+                keybd_event(VK_C, 0, KEYEVENTF_KEYDOWN, IntPtr.Zero);
+                
+                // Hold the key longer for stubborn apps
+                System.Threading.Thread.Sleep(100);
+                
+                // Release C
+                keybd_event(VK_C, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+                
+                // Small delay before releasing Ctrl
+                System.Threading.Thread.Sleep(50);
+                
+                // Release Ctrl
+                keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+                
+                Console.WriteLine("✅ Ctrl+C with delay simulated successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error simulating Ctrl+C with delay: {ex.Message}");
+            }
+        }
+        
         public void SimulatePaste()
         {
             try

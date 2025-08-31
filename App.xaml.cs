@@ -156,7 +156,7 @@ namespace TypoZap
                 Console.WriteLine("📋 Automatically copying selected text...");
                 _clipboardManager?.SimulateCopy();
                 
-                // Step 3: Wait longer for the copy operation to complete
+                // Step 3: Wait for the copy operation to complete
                 Console.WriteLine("⏳ Waiting for copy operation to complete...");
                 await System.Threading.Tasks.Task.Delay(500);
                 
@@ -165,22 +165,42 @@ namespace TypoZap
                 var selectedText = _clipboardManager?.GetClipboardText();
                 Console.WriteLine($"📋 Selected text: '{selectedText}'");
 
-                // Step 5: Check if we actually got new text (different from original)
+                // Step 5: Check if we got new text - if not, try fallback method for Teams/Electron apps
                 if (string.IsNullOrWhiteSpace(selectedText) || selectedText == originalClipboard)
                 {
-                    // Restore original clipboard if no new text was selected
-                    if (!string.IsNullOrEmpty(originalClipboard))
+                    Console.WriteLine("🔄 Standard copy failed, trying fallback method for Teams/Electron apps...");
+                    
+                    // Try alternative copy method with delays (works better with Teams)
+                    _clipboardManager?.SimulateCopyWithDelay();
+                    
+                    // Wait a bit longer for stubborn apps
+                    await System.Threading.Tasks.Task.Delay(700);
+                    
+                    // Try getting text again
+                    selectedText = _clipboardManager?.GetClipboardText();
+                    Console.WriteLine($"📋 Fallback attempt - Selected text: '{selectedText}'");
+                    
+                    // If still no luck, give up
+                    if (string.IsNullOrWhiteSpace(selectedText) || selectedText == originalClipboard)
                     {
-                        _clipboardManager?.SetClipboardText(originalClipboard);
+                        // Restore original clipboard if no new text was selected
+                        if (!string.IsNullOrEmpty(originalClipboard))
+                        {
+                            _clipboardManager?.SetClipboardText(originalClipboard);
+                        }
+                        
+                        var message = string.IsNullOrWhiteSpace(selectedText) ? 
+                            "Could not copy text. This might be a protected field or the text selection failed.\n\nTry:\n1. Re-selecting the text\n2. Using a different application\n3. Manually copying first (Ctrl+C), then using the hotkey." :
+                            "No new text selected. Please select different text and try again.";
+                        
+                        ShowNotification("Copy Failed", "Could not copy text. Try re-selecting or use different app.", WinForms.ToolTipIcon.Warning);
+                        ChangeTrayIcon("typozap.ico");
+                        return;
                     }
-                    
-                    var message = string.IsNullOrWhiteSpace(selectedText) ? 
-                        "No text was copied. Please select some text first, then press Ctrl+Shift+O." :
-                        "No new text selected. Please select different text and try again.";
-                    
-                    ShowNotification("No Text Selected", message, WinForms.ToolTipIcon.Warning);
-                    ChangeTrayIcon("typozap.ico");
-                    return;
+                    else
+                    {
+                        Console.WriteLine("✅ Fallback copy method succeeded!");
+                    }
                 }
 
                 // Step 2: Check if we have a valid API key
