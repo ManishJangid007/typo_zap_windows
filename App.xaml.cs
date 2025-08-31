@@ -252,7 +252,7 @@ namespace TypoZap
                     _clipboardManager?.SimulatePaste();
 
                     // Show success feedback immediately
-                    ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
+                    // ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
                     ChangeTrayIcon("completed.ico");
 
                     // Step 8: Wait longer for paste to complete, then restore original clipboard in background
