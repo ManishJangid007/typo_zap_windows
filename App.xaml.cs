@@ -1,8 +1,9 @@
 using System;
+using System.IO;
+using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Drawing;
-using System.IO;
 using WinForms = System.Windows.Forms;
 
 namespace TypoZap
@@ -51,7 +52,7 @@ namespace TypoZap
                 }
 
                 // Show startup notification
-                ShowNotification("TypoZap Started", "1. Select and copy text (Ctrl+C)\n2. Press Ctrl+Shift+O\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
+                ShowNotification("TypoZap Started", "1. Select text anywhere\n2. Press Ctrl+Shift+O\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
@@ -138,6 +139,7 @@ namespace TypoZap
 
         private async void ProcessHotkeyAction()
         {
+            string? originalClipboard = null;
             try
             {
                 Console.WriteLine("🔄 Starting hotkey action processing...");
@@ -145,18 +147,38 @@ namespace TypoZap
                 // Change icon to loading state
                 ChangeTrayIcon("loader.ico");
 
-                // Step 1: Get selected text from clipboard (user should have already copied it)
-                Console.WriteLine("📋 Getting text from clipboard...");
+                // Step 1: Store original clipboard content to restore later
+                Console.WriteLine("📋 Storing original clipboard content...");
+                originalClipboard = _clipboardManager?.GetClipboardText();
+                Console.WriteLine($"📋 Original clipboard: '{originalClipboard?.Substring(0, Math.Min(50, originalClipboard?.Length ?? 0))}...'");
+                
+                // Step 2: Automatically copy selected text (simulate Ctrl+C)
+                Console.WriteLine("📋 Automatically copying selected text...");
+                _clipboardManager?.SimulateCopy();
+                
+                // Step 3: Wait longer for the copy operation to complete
+                Console.WriteLine("⏳ Waiting for copy operation to complete...");
+                await System.Threading.Tasks.Task.Delay(500);
+                
+                // Step 4: Get the selected text from clipboard
+                Console.WriteLine("📋 Getting selected text from clipboard...");
                 var selectedText = _clipboardManager?.GetClipboardText();
-                Console.WriteLine($"📋 Clipboard contains: '{selectedText}'");
+                Console.WriteLine($"📋 Selected text: '{selectedText}'");
 
-                if (string.IsNullOrWhiteSpace(selectedText))
+                // Step 5: Check if we actually got new text (different from original)
+                if (string.IsNullOrWhiteSpace(selectedText) || selectedText == originalClipboard)
                 {
-                    var result = WinForms.MessageBox.Show(
-                        "No text found in clipboard.\n\nPlease select and copy (Ctrl+C) the text you want to correct first, then press Ctrl+Shift+O again.",
-                        "No Text Found",
-                        WinForms.MessageBoxButtons.OK,
-                        WinForms.MessageBoxIcon.Warning);
+                    // Restore original clipboard if no new text was selected
+                    if (!string.IsNullOrEmpty(originalClipboard))
+                    {
+                        _clipboardManager?.SetClipboardText(originalClipboard);
+                    }
+                    
+                    var message = string.IsNullOrWhiteSpace(selectedText) ? 
+                        "No text was copied. Please select some text first, then press Ctrl+Shift+O." :
+                        "No new text selected. Please select different text and try again.";
+                    
+                    ShowNotification("No Text Selected", message, WinForms.ToolTipIcon.Warning);
                     ChangeTrayIcon("typozap.ico");
                     return;
                 }
@@ -209,9 +231,12 @@ namespace TypoZap
                     Console.WriteLine("📋 Simulating Ctrl+V to paste corrected text...");
                     _clipboardManager?.SimulatePaste();
 
-                    // Show success feedback
+                    // Show success feedback immediately
                     ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
                     ChangeTrayIcon("completed.ico");
+
+                    // Step 8: Wait longer for paste to complete, then restore original clipboard in background
+                    _ = RestoreClipboardAfterDelay(originalClipboard);
 
                     // Restore normal icon after delay
                     await System.Threading.Tasks.Task.Delay(1000);
@@ -239,6 +264,26 @@ namespace TypoZap
                     WinForms.MessageBoxIcon.Error);
                 
                 ChangeTrayIcon("typozap.ico");
+            }
+        }
+
+        private async Task RestoreClipboardAfterDelay(string? originalClipboard)
+        {
+            try
+            {
+                // Wait longer for the paste operation to complete
+                await System.Threading.Tasks.Task.Delay(1500);
+                
+                if (!string.IsNullOrEmpty(originalClipboard))
+                {
+                    Console.WriteLine("📋 Restoring original clipboard content after delay...");
+                    _clipboardManager?.SetClipboardText(originalClipboard);
+                    Console.WriteLine("✅ Original clipboard content restored successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error restoring clipboard: {ex.Message}");
             }
         }
 

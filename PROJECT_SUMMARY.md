@@ -88,10 +88,10 @@ typo_zap_windows/
 ### **Workflow**
 1. **User selects text** in any application
 2. **Presses Ctrl+Shift+O** (the global hotkey)
-3. **App simulates Ctrl+C** to copy selected text
+3. **App automatically copies selected text** (simulates Ctrl+C)
 4. **Text sent to Gemini API** for grammar correction
 5. **Corrected text pasted back** using Ctrl+V
-6. **Original clipboard restored** to preserve user's content
+6. **Original clipboard content restored** to preserve user's data
 
 ### **Technical Implementation**
 - **Global Hotkey Registration**: Uses Windows RegisterHotKey API

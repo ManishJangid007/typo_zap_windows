@@ -46,12 +46,6 @@ namespace TypoZap
         {
             try
             {
-                // Store original clipboard content if not already stored
-                if (_originalClipboardContent == null)
-                {
-                    _originalClipboardContent = GetClipboardText();
-                }
-                
                 Clipboard.SetText(text);
                 Console.WriteLine($"📋 Text copied to clipboard: {text.Substring(0, Math.Min(50, text.Length))}...");
             }

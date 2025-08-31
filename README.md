@@ -41,10 +41,10 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 ### Workflow
 1. **Select text** in any application (Word, Notepad, Chrome, etc.)
 2. **Press Ctrl+Shift+O** (the global hotkey)
-3. **App simulates Ctrl+C** to copy selected text
+3. **App automatically copies selected text** (simulates Ctrl+C)
 4. **Text sent to Gemini API** for grammar correction
 5. **Corrected text pasted back** using Ctrl+V
-6. **Original clipboard restored** to preserve your content
+6. **Original clipboard content restored** to preserve your data
 
 ### Visual Feedback
 | Icon State | Meaning |
