@@ -30,24 +30,21 @@ namespace TypoZap
         
         public event EventHandler? HotkeyPressed;
         
-        public bool RegisterHotkey()
+        public bool RegisterHotkey(System.Windows.Window mainWindow)
         {
             try
             {
-                // Find the main window handle
-                var mainWindowHandle = FindWindow("HwndWrapper[TypoZap;TypoZap;TypoZap]", "TypoZap");
+                // Get the window handle using WindowInteropHelper
+                var windowHelper = new System.Windows.Interop.WindowInteropHelper(mainWindow);
+                var mainWindowHandle = windowHelper.Handle;
                 
                 if (mainWindowHandle == IntPtr.Zero)
                 {
-                    // Try alternative window class names
-                    mainWindowHandle = FindWindow("HwndWrapper[TypoZap;TypoZap;]", "TypoZap");
+                    Console.WriteLine("❌ Window handle is zero, window may not be fully initialized");
+                    return false;
                 }
                 
-                if (mainWindowHandle == IntPtr.Zero)
-                {
-                    // If we can't find the window, we'll use a message-only window
-                    mainWindowHandle = new IntPtr(-3); // HWND_MESSAGE
-                }
+                Console.WriteLine($"🔑 Registering hotkey with window handle: {mainWindowHandle}");
                 
                 // Register the hotkey: Ctrl+Shift+O
                 var modifiers = (uint)(MOD_CONTROL | MOD_SHIFT);
@@ -72,16 +69,19 @@ namespace TypoZap
             }
         }
         
-        public bool UnregisterHotkey()
+        public bool UnregisterHotkey(System.Windows.Window mainWindow)
         {
             if (!_isRegistered) return true;
             
             try
             {
-                var mainWindowHandle = FindWindow("HwndWrapper[TypoZap;TypoZap;TypoZap]", "TypoZap");
+                var windowHelper = new System.Windows.Interop.WindowInteropHelper(mainWindow);
+                var mainWindowHandle = windowHelper.Handle;
+                
                 if (mainWindowHandle == IntPtr.Zero)
                 {
-                    mainWindowHandle = new IntPtr(-3); // HWND_MESSAGE
+                    Console.WriteLine("❌ Window handle is zero during unregistration");
+                    return false;
                 }
                 
                 var result = UnregisterHotKey(mainWindowHandle, _hotkeyId);
@@ -89,6 +89,11 @@ namespace TypoZap
                 {
                     _isRegistered = false;
                     Console.WriteLine("✅ Global hotkey unregistered successfully");
+                }
+                else
+                {
+                    var error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+                    Console.WriteLine($"❌ Failed to unregister hotkey. Windows error: {error}");
                 }
                 return result;
             }
@@ -110,7 +115,8 @@ namespace TypoZap
         
         public void Dispose()
         {
-            UnregisterHotkey();
+            // Note: This will need to be called with the mainWindow parameter
+            // The App class should handle this properly
         }
     }
 }

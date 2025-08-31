@@ -21,6 +21,8 @@ namespace TypoZap
 
             try
             {
+                Console.WriteLine("🚀 TypoZap starting up...");
+                
                 // Initialize services
                 _geminiService = new GeminiService();
                 _clipboardManager = new ClipboardManager();
@@ -35,12 +37,17 @@ namespace TypoZap
                 // Setup global hotkey
                 _hotkeyManager = new HotkeyManager();
                 _hotkeyManager.HotkeyPressed += OnHotkeyPressed;
-                _hotkeyManager.RegisterHotkey();
+                RegisterHotkeyAfterWindowReady();
 
                 // Check for API key on first launch
                 if (!_geminiService.HasValidApiKey())
                 {
+                    Console.WriteLine("⚠️ No API key found, showing API key dialog");
                     ShowApiKeyDialog();
+                }
+                else
+                {
+                    Console.WriteLine("✅ API key found and loaded");
                 }
 
                 // Show startup notification
@@ -48,6 +55,7 @@ namespace TypoZap
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"❌ Startup error: {ex.Message}");
                 WinForms.MessageBox.Show($"Failed to start TypoZap: {ex.Message}", "Error",
     WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Error);
                 Shutdown();
@@ -132,14 +140,22 @@ namespace TypoZap
         {
             try
             {
+                Console.WriteLine("🔄 Starting hotkey action processing...");
+                
+                // Change icon to loading state
+                ChangeTrayIcon("loader.ico");
+
                 // Simulate Ctrl+C to copy selected text
+                Console.WriteLine("📋 Simulating Ctrl+C to copy selected text...");
                 _clipboardManager?.SimulateCopy();
 
-                // Wait a bit for clipboard to update
-                await System.Threading.Tasks.Task.Delay(100);
+                // Wait longer for clipboard to update and stabilize
+                Console.WriteLine("⏳ Waiting for clipboard to update...");
+                await System.Threading.Tasks.Task.Delay(300);
 
                 // Get selected text from clipboard
                 var selectedText = _clipboardManager?.GetClipboardText();
+                Console.WriteLine($"📋 Retrieved text from clipboard: '{selectedText}'");
 
                 if (string.IsNullOrWhiteSpace(selectedText))
                 {
@@ -148,35 +164,66 @@ namespace TypoZap
                     return;
                 }
 
+                // Check if we have a valid API key
+                if (!_geminiService?.HasValidApiKey() == true)
+                {
+                    ShowNotification("API Key Required", "Please set your Gemini API key first.", WinForms.ToolTipIcon.Warning);
+                    ChangeTrayIcon("typozap.ico");
+                    return;
+                }
+
                 // Send to Gemini for correction
+                Console.WriteLine("🤖 Sending text to Gemini for correction...");
                 var correctedText = await _geminiService?.CorrectGrammarAsync(selectedText);
+
+                Console.WriteLine($"🤖 Gemini response: '{correctedText}'");
 
                 if (!string.IsNullOrEmpty(correctedText))
                 {
                     // Copy corrected text to clipboard
+                    Console.WriteLine("📋 Copying corrected text to clipboard...");
                     _clipboardManager?.SetClipboardText(correctedText);
 
-                    // Wait a bit then simulate Ctrl+V
-                    await System.Threading.Tasks.Task.Delay(150);
-                    _clipboardManager?.SimulatePaste();
+                    // Wait longer for clipboard to update
+                    Console.WriteLine("⏳ Waiting for clipboard to update with corrected text...");
+                    await System.Threading.Tasks.Task.Delay(300);
+                    
+                    // Verify the corrected text is in clipboard
+                    var clipboardText = _clipboardManager?.GetClipboardText();
+                    Console.WriteLine($"📋 Clipboard now contains: '{clipboardText}'");
+                    
+                    if (clipboardText == correctedText)
+                    {
+                        // Simulate Ctrl+V to paste corrected text
+                        Console.WriteLine("📋 Simulating Ctrl+V to paste corrected text...");
+                        _clipboardManager?.SimulatePaste();
 
-                    // Show success feedback
-                    ShowNotification("Text Corrected", "Grammar correction applied successfully!", ToolTipIcon.Info);
-                    ChangeTrayIcon("completed.ico");
+                        // Show success feedback
+                        ShowNotification("Text Corrected", "Grammar correction applied successfully!", WinForms.ToolTipIcon.Info);
+                        ChangeTrayIcon("completed.ico");
 
-                    // Restore normal icon after delay
-                    await System.Threading.Tasks.Task.Delay(1000);
-                    ChangeTrayIcon("typozap.ico");
+                        // Restore normal icon after delay
+                        await System.Threading.Tasks.Task.Delay(1000);
+                        ChangeTrayIcon("typozap.ico");
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Clipboard content mismatch - corrected text not properly set");
+                        ShowNotification("Clipboard Error", "Failed to set corrected text in clipboard.", WinForms.ToolTipIcon.Error);
+                        ChangeTrayIcon("typozap.ico");
+                    }
                 }
                 else
                 {
+                    Console.WriteLine("❌ Gemini returned empty or null corrected text");
                     ShowNotification("Correction Failed", "Failed to get corrected text from Gemini API.", WinForms.ToolTipIcon.Error);
                     ChangeTrayIcon("typozap.ico");
                 }
             }
             catch (Exception ex)
             {
-                ShowNotification("Error", $"Failed to correct text: {ex.Message}", WinForms.ToolTipIcon.Error);
+                Console.WriteLine($"❌ Error in ProcessHotkeyAction: {ex.Message}");
+                ShowNotification("Error", $"Failed to process hotkey: {ex.Message}", WinForms.ToolTipIcon.Error);
                 ChangeTrayIcon("typozap.ico");
             }
         }
@@ -243,6 +290,41 @@ WinForms.MessageBoxIcon.Information);
         private void OnTrayIconDoubleClick(object? sender, EventArgs e)
         {
             OnSettingsClicked(sender, e);
+        }
+        
+        private void RegisterHotkeyAfterWindowReady()
+        {
+            // Use a timer to wait for the window to be fully initialized
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(1000)
+            };
+            
+            timer.Tick += (sender, e) =>
+            {
+                timer.Stop();
+                
+                if (_mainWindow != null && _hotkeyManager != null)
+                {
+                    Console.WriteLine("🔑 Attempting to register hotkey...");
+                    var success = _hotkeyManager.RegisterHotkey(_mainWindow);
+                    if (success)
+                    {
+                        Console.WriteLine("✅ Hotkey registration completed successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Hotkey registration failed");
+                    }
+                }
+            };
+            
+            timer.Start();
+        }
+
+        public void ProcessHotkeyMessage(int message, IntPtr wParam, IntPtr lParam)
+        {
+            _hotkeyManager?.ProcessHotkeyMessage(message, wParam, lParam);
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -18,6 +18,9 @@ namespace TypoZap
         {
             _httpClient = new HttpClient();
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
+            
+            // Load previously saved API key
+            _apiKey = LoadApiKeySecurely();
         }
         
         public bool HasValidApiKey()

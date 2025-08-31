@@ -10,8 +10,10 @@
         WindowStartupLocation="Manual"
         Left="-1000"
         Top="-1000"
-        Visibility="Hidden">
+        Visibility="Visible"
+        Background="Transparent"
+        Topmost="False">
     <Grid>
-        <!-- This window is intentionally hidden and minimal -->
+        <!-- This window is intentionally minimal but visible for hotkey processing -->
     </Grid>
 </Window>
