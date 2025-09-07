@@ -36,4 +36,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ApplicationManifest Include="TypoZap.exe.manifest" />
+  </ItemGroup>
+
 </Project>

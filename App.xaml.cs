@@ -71,12 +71,19 @@ namespace TypoZap
 
         private void SetupSystemTray()
         {
+            Console.WriteLine("🔧 Setting up system tray...");
+            
+            var icon = LoadIcon("typozap.ico");
+            Console.WriteLine($"🔧 Loaded icon: {icon?.Size}");
+            
             _notifyIcon = new WinForms.NotifyIcon
             {
-                Icon = LoadIcon("typozap.ico"),
+                Icon = icon,
                 Text = "TypoZap - Grammar Correction Tool",
                 Visible = true
             };
+            
+            Console.WriteLine($"🔧 System tray icon created and visible: {_notifyIcon.Visible}");
 
             // Create context menu
             var contextMenu = new WinForms.ContextMenuStrip();
@@ -94,35 +101,50 @@ namespace TypoZap
         {
             try
             {
-                var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", iconName);
-                if (File.Exists(iconPath))
+                // Try multiple possible paths for the icon
+                var possiblePaths = new[]
                 {
-                    return new Icon(iconPath);
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", iconName),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, iconName),
+                    Path.Combine(Environment.CurrentDirectory, "Assets", iconName),
+                    Path.Combine(Environment.CurrentDirectory, iconName)
+                };
+
+                foreach (var iconPath in possiblePaths)
+                {
+                    if (File.Exists(iconPath))
+                    {
+                        Console.WriteLine($"✅ Found icon at: {iconPath}");
+                        return new Icon(iconPath);
+                    }
+                }
+
+                Console.WriteLine($"⚠️ Icon not found in any path, trying embedded resource...");
+                
+                // Try to load from embedded resources
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var resourceName = $"TypoZap.Assets.{iconName}";
+                var resourceStream = assembly.GetManifestResourceStream(resourceName);
+                
+                if (resourceStream != null)
+                {
+                    Console.WriteLine($"✅ Found embedded icon: {resourceName}");
+                    return new Icon(resourceStream);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to load icon {iconName}: {ex.Message}");
+                Console.WriteLine($"❌ Failed to load icon {iconName}: {ex.Message}");
             }
 
             // Fallback to main icon if specific icon not found
             if (iconName != "typozap.ico")
             {
-                try
-                {
-                    var mainIconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "typozap.ico");
-                    if (File.Exists(mainIconPath))
-                    {
-                        return new Icon(mainIconPath);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to load main icon: {ex.Message}");
-                }
+                return LoadIcon("typozap.ico");
             }
 
             // Final fallback to system icon
+            Console.WriteLine("⚠️ Using system application icon as fallback");
             return SystemIcons.Application;
         }
 
