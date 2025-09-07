@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -13,6 +15,8 @@ namespace TypoZap
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         private string? _apiKey;
+        private List<Tone> _availableTones = new List<Tone>();
+        private string _selectedTone = "default";
         
         public GeminiService()
         {
@@ -21,6 +25,9 @@ namespace TypoZap
             
             // Load previously saved API key
             _apiKey = LoadApiKeySecurely();
+            
+            // Load available tones
+            LoadTones();
         }
         
         public bool HasValidApiKey()
@@ -32,6 +39,16 @@ namespace TypoZap
         {
             _apiKey = apiKey?.Trim();
             SaveApiKeySecurely(apiKey);
+        }
+        
+        public void SetSelectedTone(string toneTitle)
+        {
+            _selectedTone = toneTitle ?? "default";
+        }
+        
+        public List<Tone> GetAvailableTones()
+        {
+            return _availableTones.ToList();
         }
         
         public async Task<string?> CorrectGrammarAsync(string text)
@@ -112,6 +129,17 @@ namespace TypoZap
         
         private string CreatePrompt(string text)
         {
+            // Find the selected tone
+            var selectedTone = _availableTones.FirstOrDefault(t => t.Title == _selectedTone) 
+                              ?? _availableTones.FirstOrDefault();
+            
+            if (selectedTone != null)
+            {
+                // Replace {text} placeholder with the actual text
+                return selectedTone.Prompt.Replace("{text}", text);
+            }
+            
+            // Fallback to default prompt if tone not found
             return $@"Please correct the grammar, spelling, and punctuation in the following text. 
 Return only the corrected text without any explanations or additional formatting:
 
@@ -144,6 +172,47 @@ Return only the corrected text without any explanations or additional formatting
             }
         }
         
+        private void LoadTones()
+        {
+            try
+            {
+                var tonesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tones.json");
+                if (File.Exists(tonesPath))
+                {
+                    var json = File.ReadAllText(tonesPath);
+                    var toneData = JsonConvert.DeserializeObject<ToneData>(json);
+                    _availableTones = toneData?.Tones ?? new List<Tone>();
+                }
+                else
+                {
+                    // Fallback to default tone if file doesn't exist
+                    _availableTones = new List<Tone>
+                    {
+                        new Tone
+                        {
+                            Title = "default",
+                            Description = "Corrects grammar, spelling, and punctuation without changing the tone or meaning of the text.",
+                            Prompt = "Please correct the grammar, spelling, and punctuation in the following text. Return only the corrected text without any explanations or additional formatting:\n{text}"
+                        }
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error loading tones: {ex.Message}");
+                // Fallback to default tone
+                _availableTones = new List<Tone>
+                {
+                    new Tone
+                    {
+                        Title = "default",
+                        Description = "Corrects grammar, spelling, and punctuation without changing the tone or meaning of the text.",
+                        Prompt = "Please correct the grammar, spelling, and punctuation in the following text. Return only the corrected text without any explanations or additional formatting:\n{text}"
+                    }
+                };
+            }
+        }
+
         private string? LoadApiKeySecurely()
         {
             try

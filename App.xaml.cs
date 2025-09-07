@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Text;
+using System.Security.Cryptography;
+using Newtonsoft.Json;
 using WinForms = System.Windows.Forms;
 
 namespace TypoZap
@@ -50,6 +53,9 @@ namespace TypoZap
                 {
                     Console.WriteLine("✅ API key found and loaded");
                 }
+
+                // Load and apply the selected tone
+                LoadAndApplySelectedTone();
 
                 // Show startup notification
                 ShowNotification("TypoZap Started", "1. Select text anywhere\n2. Press Ctrl+Alt+Q\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
@@ -341,10 +347,57 @@ namespace TypoZap
             apiKeyWindow.ShowDialog();
         }
 
+        private void LoadAndApplySelectedTone()
+        {
+            try
+            {
+                // Load settings to get the selected tone
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var settingsPath = Path.Combine(appDataPath, "TypoZap", "settings.json");
+                
+                if (File.Exists(settingsPath))
+                {
+                    var encryptedJson = File.ReadAllText(settingsPath);
+                    var decryptedJson = DecryptSettings(encryptedJson);
+                    var settings = Newtonsoft.Json.JsonConvert.DeserializeObject<AppSettings>(decryptedJson);
+                    
+                    if (settings != null && !string.IsNullOrEmpty(settings.SelectedTone))
+                    {
+                        _geminiService?.SetSelectedTone(settings.SelectedTone);
+                        Console.WriteLine($"🎨 Selected tone: {settings.SelectedTone}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error loading selected tone: {ex.Message}");
+            }
+        }
+
+        private string DecryptSettings(string encryptedText)
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(encryptedText);
+                var decryptedData = System.Security.Cryptography.ProtectedData.Unprotect(bytes, null, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(decryptedData);
+            }
+            catch
+            {
+                return "{}";
+            }
+        }
+
         private void OnSettingsClicked(object? sender, EventArgs e)
         {
             var settingsWindow = new SettingsWindow();
-            settingsWindow.ShowDialog();
+            var result = settingsWindow.ShowDialog();
+            
+            // If settings were saved, reload the selected tone
+            if (result == true)
+            {
+                LoadAndApplySelectedTone();
+            }
         }
 
         private void OnSetApiKeyClicked(object? sender, EventArgs e)

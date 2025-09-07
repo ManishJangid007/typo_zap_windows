@@ -30,4 +30,10 @@
     <Resource Include="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="tones.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

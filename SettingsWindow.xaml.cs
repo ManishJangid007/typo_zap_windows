@@ -3,6 +3,8 @@ using System.Windows;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using WinForms = System.Windows.Forms;
 
@@ -12,12 +14,16 @@ namespace TypoZap
     {
         private AppSettings _currentSettings;
         private readonly string _settingsPath;
+        private List<Tone> _availableTones = new List<Tone>();
         
         public SettingsWindow()
         {
             InitializeComponent();
             _settingsPath = GetSettingsPath();
             LoadSettings();
+            
+            // Load tones after UI is initialized
+            Loaded += (s, e) => LoadTones();
         }
         
         private string GetSettingsPath()
@@ -54,6 +60,65 @@ namespace TypoZap
             }
         }
         
+        private void LoadTones()
+        {
+            try
+            {
+                var tonesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tones.json");
+                if (File.Exists(tonesPath))
+                {
+                    var json = File.ReadAllText(tonesPath);
+                    var toneData = JsonConvert.DeserializeObject<ToneData>(json);
+                    _availableTones = toneData?.Tones ?? new List<Tone>();
+                }
+                else
+                {
+                    // Fallback to default tone if file doesn't exist
+                    _availableTones = new List<Tone>
+                    {
+                        new Tone
+                        {
+                            Title = "default",
+                            Description = "Corrects grammar, spelling, and punctuation without changing the tone or meaning of the text.",
+                            Prompt = "Please correct the grammar, spelling, and punctuation in the following text. Return only the corrected text without any explanations or additional formatting:\n{text}"
+                        }
+                    };
+                }
+
+                // Populate the ComboBox
+                ToneComboBox.ItemsSource = _availableTones;
+                
+                // Select the current tone or default to first one
+                var currentTone = _availableTones.FirstOrDefault(t => t.Title == _currentSettings.SelectedTone) 
+                                ?? _availableTones.FirstOrDefault();
+                if (currentTone != null)
+                {
+                    ToneComboBox.SelectedItem = currentTone;
+                    ToneDescriptionTextBlock.Text = currentTone.Description;
+                }
+                else
+                {
+                    ToneComboBox.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error loading tones: {ex.Message}");
+                // Fallback to default tone
+                _availableTones = new List<Tone>
+                {
+                    new Tone
+                    {
+                        Title = "default",
+                        Description = "Corrects grammar, spelling, and punctuation without changing the tone or meaning of the text.",
+                        Prompt = "Please correct the grammar, spelling, and punctuation in the following text. Return only the corrected text without any explanations or additional formatting:\n{text}"
+                    }
+                };
+                ToneComboBox.ItemsSource = _availableTones;
+                ToneComboBox.SelectedIndex = 0;
+            }
+        }
+
         private void ApplySettingsToUI()
         {
             StartWithWindowsCheckBox.IsChecked = _currentSettings.StartWithWindows;
@@ -67,6 +132,7 @@ namespace TypoZap
                 // Update settings from UI
                 _currentSettings.StartWithWindows = StartWithWindowsCheckBox.IsChecked ?? false;
                 _currentSettings.MinimizeToTray = MinimizeToTrayCheckBox.IsChecked ?? true;
+                _currentSettings.SelectedTone = (ToneComboBox.SelectedItem as Tone)?.Title ?? "default";
                 _currentSettings.LastModified = DateTime.Now;
                 
                 // Serialize and encrypt settings
@@ -144,6 +210,14 @@ namespace TypoZap
             }
         }
         
+        private void ToneComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (ToneComboBox.SelectedItem is Tone selectedTone)
+            {
+                ToneDescriptionTextBlock.Text = selectedTone.Description;
+            }
+        }
+
         private void ChangeApiKeyButton_Click(object sender, RoutedEventArgs e)
         {
             var apiKeyWindow = new ApiKeyWindow();
@@ -189,6 +263,7 @@ namespace TypoZap
     {
         public bool StartWithWindows { get; set; } = false;
         public bool MinimizeToTray { get; set; } = true;
+        public string SelectedTone { get; set; } = "default";
         public DateTime LastModified { get; set; } = DateTime.Now;
     }
 }
