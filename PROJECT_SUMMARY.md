@@ -2,12 +2,12 @@
 
 ## 🚀 What We Built
 
-**TypoZap for Windows** is a complete WPF utility app that automatically corrects grammar and spelling using Google's Gemini AI API. The app provides a seamless experience where users can press **Ctrl+Shift+O** from anywhere to grab selected text, send it for AI-powered correction, and paste the improved version back.
+**TypoZap for Windows** is a complete WPF utility app that automatically corrects grammar and spelling using Google's Gemini AI API. The app provides a seamless experience where users can press **Ctrl+Alt+Q** from anywhere to grab selected text, send it for AI-powered correction, and paste the improved version back.
 
 ## ✨ Key Features Implemented
 
 ### ✅ **Core Functionality**
-- **Global Hotkey**: Ctrl+Shift+O works system-wide
+- **Global Hotkey**: Ctrl+Alt+Q works system-wide
 - **AI Grammar Correction**: Integrates with Google's Gemini API
 - **System Tray App**: Lightweight, always accessible from system tray
 - **Smart Clipboard Management**: Preserves original clipboard contents
@@ -36,7 +36,7 @@ typo_zap_windows/
 ├── App.xaml.cs              # Application logic and system tray setup
 ├── MainWindow.xaml          # Hidden main window
 ├── MainWindow.xaml.cs       # Main window logic
-├── HotkeyManager.cs         # Global hotkey handling (Ctrl+Shift+O)
+├── HotkeyManager.cs         # Global hotkey handling (Ctrl+Alt+Q)
 ├── ClipboardManager.cs      # Clipboard operations and keyboard simulation
 ├── GeminiService.cs         # Gemini API integration
 ├── ApiKeyWindow.xaml        # API key input dialog
@@ -57,7 +57,7 @@ typo_zap_windows/
    - User interface and notifications
 
 2. **HotkeyManager.cs**: Global hotkey handling
-   - Registers Ctrl+Shift+O using Windows RegisterHotKey API
+   - Registers Ctrl+Alt+Q using Windows RegisterHotKey API
    - Handles hotkey events and triggers text correction workflow
    - Proper cleanup on application shutdown
 
@@ -87,7 +87,7 @@ typo_zap_windows/
 
 ### **Workflow**
 1. **User selects text** in any application
-2. **Presses Ctrl+Shift+O** (the global hotkey)
+2. **Presses Ctrl+Alt+Q** (the global hotkey)
 3. **App automatically copies selected text** (simulates Ctrl+C)
 4. **Text sent to Gemini API** for grammar correction
 5. **Corrected text pasted back** using Ctrl+V
@@ -124,12 +124,12 @@ dotnet run -c Release
 ### **First Run Setup**
 1. **Launch the app** - icon appears in system tray
 2. **Enter Gemini API key** when requested
-3. **Start using** with Ctrl+Shift+O hotkey
+3. **Start using** with Ctrl+Alt+Q hotkey
 
 ## 🧪 Testing & Usage
 
 ### **Test Scenarios**
-- **Basic Correction**: Select text with errors and press Ctrl+Shift+O
+- **Basic Correction**: Select text with errors and press Ctrl+Alt+Q
 - **Edge Cases**: Empty selection, no text, secure fields
 - **Different Apps**: Word, Notepad, Chrome, messaging apps
 - **Error Handling**: Invalid API key, network issues
@@ -160,7 +160,7 @@ dotnet run -c Release
 ### **✅ Completed**
 - Core WPF application structure
 - System tray integration
-- Global hotkey registration (Ctrl+Shift+O)
+- Global hotkey registration (Ctrl+Alt+Q)
 - Clipboard management and keyboard simulation
 - Gemini API integration
 - API key management and secure storage
@@ -184,7 +184,7 @@ dotnet run -c Release
 ### **Current Limitations**
 - **Icon Assets**: Placeholder icons need to be created
 - **Windows Testing**: Built on macOS, needs Windows testing
-- **Hotkey Conflicts**: May conflict with other applications using Ctrl+Shift+O
+- **Hotkey Conflicts**: May conflict with other applications using Ctrl+Alt+Q
 
 ### **Platform Considerations**
 - **Windows Only**: Designed specifically for Windows

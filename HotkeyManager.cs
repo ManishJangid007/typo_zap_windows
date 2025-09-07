@@ -9,8 +9,8 @@ namespace TypoZap
         // Windows API constants
         private const int WM_HOTKEY = 0x0312;
         private const int MOD_CONTROL = 0x0002;
-        private const int MOD_SHIFT = 0x0004;
-        private const int VK_O = 0x4F; // Virtual key code for 'O'
+        private const int MOD_ALT = 0x0001;
+        private const int VK_Q = 0x51; // Virtual key code for 'Q'
         
         // Windows API functions
         [DllImport("user32.dll")]
@@ -46,14 +46,14 @@ namespace TypoZap
                 
                 Console.WriteLine($"🔑 Registering hotkey with window handle: {mainWindowHandle}");
                 
-                // Register the hotkey: Ctrl+Shift+O
-                var modifiers = (uint)(MOD_CONTROL | MOD_SHIFT);
-                var result = RegisterHotKey(mainWindowHandle, _hotkeyId, modifiers, (uint)VK_O);
+                // Register the hotkey: Ctrl+Alt+Q
+                var modifiers = (uint)(MOD_CONTROL | MOD_ALT);
+                var result = RegisterHotKey(mainWindowHandle, _hotkeyId, modifiers, (uint)VK_Q);
                 
                 if (result)
                 {
                     _isRegistered = true;
-                    Console.WriteLine("✅ Global hotkey Ctrl+Shift+O registered successfully");
+                    Console.WriteLine("✅ Global hotkey Ctrl+Alt+Q registered successfully");
                     return true;
                 }
                 else
@@ -108,7 +108,7 @@ namespace TypoZap
         {
             if (message == WM_HOTKEY && wParam.ToInt32() == _hotkeyId)
             {
-                Console.WriteLine("🔥 Hotkey Ctrl+Shift+O pressed!");
+                Console.WriteLine("🔥 Hotkey Ctrl+Alt+Q pressed!");
                 HotkeyPressed?.Invoke(this, EventArgs.Empty);
             }
         }

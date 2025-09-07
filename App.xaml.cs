@@ -52,7 +52,7 @@ namespace TypoZap
                 }
 
                 // Show startup notification
-                ShowNotification("TypoZap Started", "1. Select text anywhere\n2. Press Ctrl+Shift+O\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
+                ShowNotification("TypoZap Started", "1. Select text anywhere\n2. Press Ctrl+Alt+Q\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
@@ -355,7 +355,7 @@ namespace TypoZap
         private void OnAboutClicked(object? sender, EventArgs e)
         {
             WinForms.MessageBox.Show(
-"TypoZap v1.0.0\n\nA Windows utility app that fixes grammar errors instantly using Gemini API.\n\nPress Ctrl+Shift+O to correct selected text.",
+"TypoZap v1.0.0\n\nA Windows utility app that fixes grammar errors instantly using Gemini API.\n\nPress Ctrl+Alt+Q to correct selected text.",
 "About TypoZap",
 WinForms.MessageBoxButtons.OK,
 WinForms.MessageBoxIcon.Information);

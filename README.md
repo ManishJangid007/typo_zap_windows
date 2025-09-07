@@ -1,11 +1,11 @@
 # TypoZap for Windows 🪟
 
-A Windows utility app that lives in the system tray and lets users fix grammar errors instantly using Gemini API by selecting text and pressing **Ctrl+Shift+O**. The fixed text automatically replaces the selected text with minimal delay.
+A Windows utility app that lives in the system tray and lets users fix grammar errors instantly using Gemini API by selecting text and pressing **Ctrl+Alt+Q**. The fixed text automatically replaces the selected text with minimal delay.
 
 ## ✨ Features
 
 - **System Tray App**: Runs in the background without showing a main window
-- **Global Hotkey**: Press Ctrl+Shift+O from anywhere to correct selected text
+- **Global Hotkey**: Press Ctrl+Alt+Q from anywhere to correct selected text
 - **AI-Powered Grammar Correction**: Uses Google's Gemini API for accurate corrections
 - **Secure API Key Storage**: Encrypts and stores your API key securely
 - **Smart Clipboard Management**: Preserves your original clipboard content
@@ -26,7 +26,7 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 2. **Run the installer** (TypoZap-Setup.exe)
 3. **Launch TypoZap** - it will appear in your system tray
 4. **Enter your Gemini API key** when prompted
-5. **Start using** with Ctrl+Shift+O hotkey!
+5. **Start using** with Ctrl+Alt+Q hotkey!
 
 ### First Run Setup
 
@@ -34,13 +34,13 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 2. **Enter Gemini API key** when requested
 3. **Grant permissions** if Windows asks for accessibility
 4. **Select text** in any application
-5. **Press Ctrl+Shift+O** to correct grammar instantly!
+5. **Press Ctrl+Alt+Q** to correct grammar instantly!
 
 ## 🔧 How It Works
 
 ### Workflow
 1. **Select text** in any application (Word, Notepad, Chrome, etc.)
-2. **Press Ctrl+Shift+O** (the global hotkey)
+2. **Press Ctrl+Alt+Q** (the global hotkey)
 3. **App automatically copies selected text** (simulates Ctrl+C)
 4. **Text sent to Gemini API** for grammar correction
 5. **Corrected text pasted back** using Ctrl+V
@@ -98,7 +98,7 @@ typo_zap_windows/
 ### Settings Window
 Access settings by right-clicking the system tray icon and selecting "Settings":
 
-- **Hotkey Settings**: View current hotkey (Ctrl+Shift+O)
+- **Hotkey Settings**: View current hotkey (Ctrl+Alt+Q)
 - **Notification Settings**: Enable/disable various notifications
 - **API Settings**: Change your Gemini API key
 - **Advanced Settings**: Startup with Windows, minimize to tray
@@ -129,7 +129,7 @@ Your Gemini API key is:
 
 #### Hotkey Not Working
 - **Check if TypoZap is running** in system tray
-- **Verify no other apps** are using Ctrl+Shift+O
+- **Verify no other apps** are using Ctrl+Alt+Q
 - **Restart TypoZap** if needed
 
 #### API Key Issues

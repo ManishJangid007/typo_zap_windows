@@ -3,11 +3,11 @@
     "platform": "Windows",
     "language": "C#",
     "framework": ".NET 8 (WPF)",
-    "description": "A Windows utility app that lives in the system tray and lets users fix grammar errors instantly using Gemini API by selecting text and pressing Ctrl+Shift+O. The fixed text should automatically replace the selected text with minimal delay.",
+    "description": "A Windows utility app that lives in the system tray and lets users fix grammar errors instantly using Gemini API by selecting text and pressing Ctrl+Alt+Q. The fixed text should automatically replace the selected text with minimal delay.",
     "steps": [
         "1. Create a new WPF project in Visual Studio named TypoZap.",
         "2. Implement a hidden window with a system tray icon (NotifyIcon). The app should run in the background without showing a main window unless user opens settings.",
-        "3. Capture global hotkey Ctrl+Shift+O using Windows API (RegisterHotKey).",
+        "3. Capture global hotkey Ctrl+Alt+Q using Windows API (RegisterHotKey).",
         "4. When hotkey is pressed, get the currently selected text (use Windows Clipboard: simulate Ctrl+C, read text).",
         "5. Call Gemini API to correct grammar using the selected text. Refer to official Gemini API quickstart: https://ai.google.dev/gemini-api/docs/quickstart",
         "6. Parse the Gemini response and copy the corrected text to clipboard.",
@@ -29,7 +29,7 @@
     ],
     "deliverables": [
         "WPF application with tray icon",
-        "Global hotkey listener (default Ctrl+Shift+O)",
+        "Global hotkey listener (default Ctrl+Alt+Q)",
         "Clipboard integration",
         "Gemini API integration",
         "Custom icons for idle, loading, and success states",

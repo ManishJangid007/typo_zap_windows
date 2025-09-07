@@ -48,7 +48,7 @@ Installation:
 1. Extract to any folder (e.g., C:\Program Files\TypoZap)
 2. Run TypoZap.exe
 3. Enter your Gemini API key when prompted
-4. Start using with Ctrl+Shift+O!
+4. Start using with Ctrl+Alt+Q!
 
 No installation required - this is a portable executable.
 "@ | Out-File "publish\TypoZap\README.txt"
