@@ -56,8 +56,6 @@ namespace TypoZap
         
         private void ApplySettingsToUI()
         {
-            EnableNotificationsCheckBox.IsChecked = _currentSettings.EnableNotifications;
-            ShowSuccessNotificationsCheckBox.IsChecked = _currentSettings.ShowSuccessNotifications;
             StartWithWindowsCheckBox.IsChecked = _currentSettings.StartWithWindows;
             MinimizeToTrayCheckBox.IsChecked = _currentSettings.MinimizeToTray;
         }
@@ -67,8 +65,6 @@ namespace TypoZap
             try
             {
                 // Update settings from UI
-                _currentSettings.EnableNotifications = EnableNotificationsCheckBox.IsChecked ?? true;
-                _currentSettings.ShowSuccessNotifications = ShowSuccessNotificationsCheckBox.IsChecked ?? true;
                 _currentSettings.StartWithWindows = StartWithWindowsCheckBox.IsChecked ?? false;
                 _currentSettings.MinimizeToTray = MinimizeToTrayCheckBox.IsChecked ?? true;
                 _currentSettings.LastModified = DateTime.Now;
@@ -191,8 +187,6 @@ namespace TypoZap
     
     public class AppSettings
     {
-        public bool EnableNotifications { get; set; } = true;
-        public bool ShowSuccessNotifications { get; set; } = true;
         public bool StartWithWindows { get; set; } = false;
         public bool MinimizeToTray { get; set; } = true;
         public DateTime LastModified { get; set; } = DateTime.Now;

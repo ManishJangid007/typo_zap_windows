@@ -10,7 +10,7 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 - **Secure API Key Storage**: Encrypts and stores your API key securely
 - **Smart Clipboard Management**: Preserves your original clipboard content
 - **Visual Feedback**: Icon changes show processing status and results
-- **Settings Window**: Customize notifications, startup behavior, and more
+- **Settings Window**: Customize startup behavior and more
 
 ## 🚀 Quick Start
 
@@ -99,7 +99,6 @@ typo_zap_windows/
 Access settings by right-clicking the system tray icon and selecting "Settings":
 
 - **Hotkey Settings**: View current hotkey (Ctrl+Alt+Q)
-- **Notification Settings**: Enable/disable various notifications
 - **API Settings**: Change your Gemini API key
 - **Advanced Settings**: Startup with Windows, minimize to tray
 

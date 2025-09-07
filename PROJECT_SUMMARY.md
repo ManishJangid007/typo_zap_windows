@@ -78,7 +78,7 @@ typo_zap_windows/
    - Basic validation and error handling
 
 6. **SettingsWindow.xaml**: User preferences
-   - Notification settings
+   - Advanced settings
    - Startup with Windows option
    - API key management
    - Secure settings storage

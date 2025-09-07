@@ -13,7 +13,7 @@
         "6. Parse the Gemini response and copy the corrected text to clipboard.",
         "7. Simulate Ctrl+V to paste the corrected text back into the original field.",
         "8. Show a small notification or tooltip near the system tray with a minimal origami-style icon when replacement is complete (use the icon you designed).",
-        "9. Add a settings window (openable from tray menu) that allows users to change hotkey, enable/disable notifications, and set API key securely (store in Windows Credential Manager or encrypted config file).",
+        "9. Add a settings window (openable from tray menu) that allows users to change hotkey and set API key securely (store in Windows Credential Manager or encrypted config file).",
         "10. Add a loader animation icon when Gemini API request is in progress (small spinner near tray icon).",
         "11. Build in Release mode and test on multiple text fields (Word, Notepad, Chrome input box) to ensure text replacement works fast and reliably.",
         "12. Sign the executable with a code signing certificate (optional but recommended for trust).",
