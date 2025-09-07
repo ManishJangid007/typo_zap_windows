@@ -10,9 +10,9 @@
     <AssemblyDescription>A Windows utility app that fixes grammar errors instantly using Gemini API</AssemblyDescription>
     <AssemblyCompany>TypoZap</AssemblyCompany>
     <AssemblyProduct>TypoZap</AssemblyProduct>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <ProductVersion>1.0.0.0</ProductVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <ProductVersion>1.1.0.0</ProductVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
