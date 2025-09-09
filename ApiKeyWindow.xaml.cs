@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Windows;
 using WinForms = System.Windows.Forms;
 
@@ -91,6 +92,23 @@ namespace TypoZap
         {
             DialogResult = false;
             Close();
+        }
+        
+        private void ApiKeyLinkTextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                // Open the Google AI Studio API key page in the default browser
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "https://aistudio.google.com/apikey",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                ShowStatus($"Error opening browser: {ex.Message}", false);
+            }
         }
         
         private void ShowStatus(string message, bool isSuccess)

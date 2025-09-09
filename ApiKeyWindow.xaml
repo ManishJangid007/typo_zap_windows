@@ -2,14 +2,17 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gemini API Key Required"
-        Height="250"
+        Height="300"
         Width="450"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
+        MinHeight="280"
+        MinWidth="400"
         WindowStyle="SingleBorderWindow">
     
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -25,14 +28,25 @@
                    HorizontalAlignment="Center"
                    Margin="0,0,0,10"/>
         
-        <!-- Help text -->
-        <TextBlock Grid.Row="1" 
-                   Text="You can get one from https://ai.google.dev/gemini-api"
-                   FontSize="12"
-                   Foreground="Gray"
-                   HorizontalAlignment="Center"
-                   TextWrapping="Wrap"
-                   Margin="0,0,0,20"/>
+        <!-- Help text with clickable link -->
+        <StackPanel Grid.Row="1" 
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,20">
+            <TextBlock Text="You can get your API key from:"
+                       FontSize="12"
+                       Foreground="Gray"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,5"/>
+            <TextBlock x:Name="ApiKeyLinkTextBlock"
+                       Text="https://aistudio.google.com/apikey"
+                       FontSize="12"
+                       Foreground="Blue"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"
+                       Cursor="Hand"
+                       TextDecorations="Underline"
+                       MouseLeftButtonDown="ApiKeyLinkTextBlock_MouseLeftButtonDown"/>
+        </StackPanel>
         
         <!-- API Key input -->
         <TextBox x:Name="ApiKeyTextBox"
@@ -44,10 +58,10 @@
                  Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"/>
         
         <!-- Buttons -->
-        <StackPanel Grid.Row="3" 
+        <StackPanel Grid.Row="4" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"
-                    Margin="0,0,0,20">
+                    Margin="0,20,0,20">
             
             <Button x:Name="PasteButton"
                     Content="Paste Key"
@@ -74,11 +88,12 @@
         
         <!-- Status message -->
         <TextBlock x:Name="StatusTextBlock"
-                   Grid.Row="4"
+                   Grid.Row="5"
                    Text=""
                    FontSize="12"
                    Foreground="Blue"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"/>
+                   VerticalAlignment="Top"
+                   Margin="0,10,0,0"/>
     </Grid>
 </Window>
