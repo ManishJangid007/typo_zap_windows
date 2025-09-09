@@ -32,7 +32,7 @@ Copy-Item "README.md" "publish\TypoZap\" -ErrorAction SilentlyContinue
 Copy-Item "ICON_USAGE.md" "publish\TypoZap\" -ErrorAction SilentlyContinue
 
 # Create version info
-$version = "1.0.0"
+$version = "1.1.2"
 $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
 @"
