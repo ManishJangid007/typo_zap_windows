@@ -5,12 +5,14 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 ## ✨ Features
 
 - **System Tray App**: Runs in the background without showing a main window
-- **Global Hotkey**: Press Ctrl+Alt+Q from anywhere to correct selected text
+- **Customizable Global Hotkey**: Set your own hotkey combination (default: Ctrl+Alt+Q)
 - **AI-Powered Grammar Correction**: Uses Google's Gemini API for accurate corrections
+- **Multiple Writing Tones**: Choose from General, Polite, Aggressive, Sarcastic, or Funny tones
+- **Custom Tone Support**: Add your own custom writing styles and prompts
 - **Secure API Key Storage**: Encrypts and stores your API key securely
 - **Smart Clipboard Management**: Preserves your original clipboard content
 - **Visual Feedback**: Icon changes show processing status and results
-- **Settings Window**: Customize startup behavior and more
+- **Settings Window**: Customize hotkeys, tones, and more
 
 ## 🚀 Quick Start
 
@@ -40,9 +42,9 @@ A Windows utility app that lives in the system tray and lets users fix grammar e
 
 ### Workflow
 1. **Select text** in any application (Word, Notepad, Chrome, etc.)
-2. **Press Ctrl+Alt+Q** (the global hotkey)
+2. **Press your custom hotkey** (default: Ctrl+Alt+Q)
 3. **App automatically copies selected text** (simulates Ctrl+C)
-4. **Text sent to Gemini API** for grammar correction
+4. **Text sent to Gemini API** for grammar correction with selected tone
 5. **Corrected text pasted back** using Ctrl+V
 6. **Original clipboard content restored** to preserve your data
 
@@ -79,18 +81,22 @@ dotnet run -c Release
 ### Project Structure
 ```
 typo_zap_windows/
-├── TypoZap.csproj          # Project file
-├── App.xaml                 # Main application XAML
-├── App.xaml.cs              # Application logic
-├── MainWindow.xaml          # Hidden main window
-├── MainWindow.xaml.cs       # Main window logic
-├── HotkeyManager.cs         # Global hotkey handling
-├── ClipboardManager.cs      # Clipboard operations
-├── GeminiService.cs         # Gemini API integration
-├── ApiKeyWindow.xaml        # API key input dialog
-├── SettingsWindow.xaml      # Settings configuration
-├── Assets/                  # Icons and resources
-└── README.md                # This file
+├── TypoZap.csproj              # Project file
+├── App.xaml                     # Main application XAML
+├── App.xaml.cs                  # Application logic
+├── MainWindow.xaml              # Hidden main window
+├── MainWindow.xaml.cs           # Main window logic
+├── HotkeyManager.cs             # Global hotkey handling
+├── ClipboardManager.cs          # Clipboard operations
+├── GeminiService.cs             # Gemini API integration
+├── ApiKeyWindow.xaml            # API key input dialog
+├── SettingsWindow.xaml          # Settings configuration
+├── HotkeyRecordingWindow.xaml   # Custom hotkey recording dialog
+├── AboutWindow.xaml             # About dialog
+├── ToneModels.cs                # Tone data models
+├── tones.json                   # Writing tone configurations
+├── Assets/                      # Icons and resources
+└── README.md                    # This file
 ```
 
 ## ⚙️ Configuration
@@ -98,9 +104,61 @@ typo_zap_windows/
 ### Settings Window
 Access settings by right-clicking the system tray icon and selecting "Settings":
 
-- **Hotkey Settings**: View current hotkey (Ctrl+Alt+Q)
+- **Hotkey Settings**: Record and customize your global hotkey combination
+- **Tone Settings**: Choose from available writing tones (General, Polite, Aggressive, Sarcastic, Funny)
 - **API Settings**: Change your Gemini API key
-- **Advanced Settings**: Startup with Windows, minimize to tray
+
+### Custom Hotkeys
+TypoZap allows you to set any hotkey combination you prefer:
+
+1. **Open Settings** → Right-click system tray icon → Settings
+2. **Click "Record New Hotkey"** in the Hotkey Settings section
+3. **Press your desired key combination** (e.g., Ctrl+Shift+G, Alt+F12, etc.)
+4. **Click "Save"** to apply the new hotkey immediately
+5. **Use your custom hotkey** from anywhere in Windows
+
+**Supported Keys:**
+- **Modifiers**: Ctrl, Alt, Shift, Win (any combination)
+- **Main Keys**: A-Z, 0-9, F1-F12, Space, Enter, Arrow keys, etc.
+- **Examples**: Ctrl+Shift+G, Alt+F12, Win+Q, Ctrl+Alt+Space
+
+### Custom Tones
+You can add your own custom writing styles by editing the `tones.json` file:
+
+1. **Locate the tones.json file** in the TypoZap installation directory
+2. **Open it in a text editor** (Notepad, VS Code, etc.)
+3. **Add your custom tone** following the existing structure
+4. **Restart TypoZap** to load the new tone
+
+#### Adding a Custom Tone
+```json
+{
+    "title": "Your Tone Name",
+    "description": "Brief description of what this tone does",
+    "prompt": "Your custom prompt here. Use {text} as placeholder for the input text. If the text contains <> brackets, treat the content inside as an override prompt and ignore this prompt. Otherwise, [your instructions here]. Return only the processed text without explanations. Here's the input text:\n{text}"
+}
+```
+
+#### Tone Structure Rules
+- **title**: Display name in the settings dropdown
+- **description**: Brief explanation of the tone's purpose
+- **prompt**: The AI prompt template (must include `{text}` placeholder)
+- **Override Support**: Use `<>` brackets for inline prompt overrides
+- **Output Format**: Always return only the processed text, no explanations
+
+#### Example Custom Tones
+```json
+{
+    "title": "Academic",
+    "description": "Formal academic writing style with proper citations",
+    "prompt": "If the text contains <> brackets, treat the content inside as an override prompt and ignore this prompt. Otherwise, rewrite the following text in a formal academic style, ensuring proper grammar, formal language, and academic tone. Return only the revised text without explanations. Here's the input text:\n{text}"
+},
+{
+    "title": "Casual",
+    "description": "Relaxed, conversational tone for informal communication",
+    "prompt": "If the text contains <> brackets, treat the content inside as an override prompt and ignore this prompt. Otherwise, rewrite the following text in a casual, conversational tone while maintaining proper grammar. Make it sound natural and friendly. Return only the revised text without explanations. Here's the input text:\n{text}"
+}
+```
 
 ### API Key Management
 Your Gemini API key is:
@@ -128,7 +186,9 @@ Your Gemini API key is:
 
 #### Hotkey Not Working
 - **Check if TypoZap is running** in system tray
-- **Verify no other apps** are using Ctrl+Alt+Q
+- **Verify no other apps** are using your custom hotkey
+- **Check hotkey settings** in the Settings window
+- **Try a different key combination** if current one conflicts
 - **Restart TypoZap** if needed
 
 #### API Key Issues
