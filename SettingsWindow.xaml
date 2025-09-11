@@ -17,7 +17,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -107,57 +106,48 @@
             </Grid>
         </GroupBox>
         
-        <!-- Advanced Settings -->
-        <GroupBox Grid.Row="4" Header="Advanced Settings" Margin="0,0,0,15">
-            <Grid Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                
-                <CheckBox x:Name="StartWithWindowsCheckBox"
-                          Grid.Row="0"
-                          Content="Start TypoZap with Windows"
-                          IsChecked="False"
-                          Margin="0,0,0,5"/>
-                
-                <CheckBox x:Name="MinimizeToTrayCheckBox"
-                          Grid.Row="1"
-                          Content="Minimize to system tray"
-                          IsChecked="True"/>
-            </Grid>
-        </GroupBox>
-        
         <!-- Spacer -->
-        <Grid Grid.Row="5" />
+        <Grid Grid.Row="4" />
         
-        <!-- Buttons -->
-        <StackPanel Grid.Row="6" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right">
+        <!-- Buttons and Credits -->
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
             
-            <Button x:Name="ResetButton"
-                    Content="Reset to Defaults"
-                    Width="120"
-                    Height="32"
-                    Margin="0,0,10,0"
-                    Click="ResetButton_Click"/>
+            <!-- Credits Link -->
+            <TextBlock Grid.Column="0"
+                       x:Name="CreditsLink"
+                       Text="Developed by Manish Jangid"
+                       FontSize="10"
+                       Foreground="Gray"
+                       VerticalAlignment="Center"
+                       Cursor="Hand"
+                       TextDecorations="Underline"
+                       MouseLeftButtonDown="CreditsLink_MouseLeftButtonDown"/>
             
-            <Button x:Name="SaveButton"
-                    Content="Save Settings"
-                    Width="100"
-                    Height="32"
-                    Margin="0,0,10,0"
-                    IsDefault="True"
-                    Click="SaveButton_Click"/>
-            
-            <Button x:Name="CancelButton"
-                    Content="Cancel"
-                    Width="80"
-                    Height="32"
-                    IsCancel="True"
-                    Click="CancelButton_Click"/>
-        </StackPanel>
+            <!-- Buttons -->
+            <StackPanel Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                
+                <Button x:Name="SaveButton"
+                        Content="Save Settings"
+                        Width="100"
+                        Height="32"
+                        Margin="0,0,10,0"
+                        IsDefault="True"
+                        Click="SaveButton_Click"/>
+                
+                <Button x:Name="CancelButton"
+                        Content="Cancel"
+                        Width="80"
+                        Height="32"
+                        IsCancel="True"
+                        Click="CancelButton_Click"/>
+            </StackPanel>
+        </Grid>
         </Grid>
     </ScrollViewer>
 </Window>

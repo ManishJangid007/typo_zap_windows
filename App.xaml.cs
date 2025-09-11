@@ -429,11 +429,8 @@ namespace TypoZap
 
         private void OnAboutClicked(object? sender, EventArgs e)
         {
-            WinForms.MessageBox.Show(
-"TypoZap v1.0.0\n\nA Windows utility app that fixes grammar errors instantly using Gemini API.\n\nPress Ctrl+Alt+Q to correct selected text.",
-"About TypoZap",
-WinForms.MessageBoxButtons.OK,
-WinForms.MessageBoxIcon.Information);
+            var aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
         }
 
         private void OnExitClicked(object? sender, EventArgs e)

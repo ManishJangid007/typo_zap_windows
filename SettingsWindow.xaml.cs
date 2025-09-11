@@ -121,8 +121,7 @@ namespace TypoZap
 
         private void ApplySettingsToUI()
         {
-            StartWithWindowsCheckBox.IsChecked = _currentSettings.StartWithWindows;
-            MinimizeToTrayCheckBox.IsChecked = _currentSettings.MinimizeToTray;
+            // Advanced settings removed - no UI elements to apply
         }
         
         private void SaveSettings()
@@ -130,8 +129,6 @@ namespace TypoZap
             try
             {
                 // Update settings from UI
-                _currentSettings.StartWithWindows = StartWithWindowsCheckBox.IsChecked ?? false;
-                _currentSettings.MinimizeToTray = MinimizeToTrayCheckBox.IsChecked ?? true;
                 _currentSettings.SelectedTone = (ToneComboBox.SelectedItem as Tone)?.Title ?? "default";
                 _currentSettings.LastModified = DateTime.Now;
                 
@@ -141,9 +138,6 @@ namespace TypoZap
                 
                 // Save to file
                 File.WriteAllText(_settingsPath, encryptedJson);
-                
-                // Apply startup with Windows setting
-                ApplyStartupSetting();
                 
                 WinForms.MessageBox.Show("Settings saved successfully!", "Success", 
                     WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Information);
@@ -155,30 +149,6 @@ namespace TypoZap
             }
         }
         
-        private void ApplyStartupSetting()
-        {
-            try
-            {
-                var startupKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                
-                if (_currentSettings.StartWithWindows)
-                {
-                    var exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                    startupKey?.SetValue("TypoZap", $"\"{exePath}\"");
-                }
-                else
-                {
-                    startupKey?.DeleteValue("TypoZap", false);
-                }
-                
-                startupKey?.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error setting startup with Windows: {ex.Message}");
-            }
-        }
         
         private string EncryptSettings(string plainText)
         {
@@ -230,20 +200,24 @@ namespace TypoZap
             apiKeyWindow.ShowDialog();
         }
         
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        private void CreditsLink_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var result = WinForms.MessageBox.Show(
-                "Are you sure you want to reset all settings to default values?",
-                "Reset Settings",
-                WinForms.MessageBoxButtons.YesNo,
-                WinForms.MessageBoxIcon.Question);
-                
-            if (result == WinForms.DialogResult.Yes)
+            try
             {
-                _currentSettings = new AppSettings();
-                ApplySettingsToUI();
+                // Open the GitHub repository in the default browser
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/ManishJangid007/typo_zap_windows",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                WinForms.MessageBox.Show($"Error opening browser: {ex.Message}", "Error", 
+                    WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Warning);
             }
         }
+        
         
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -261,8 +235,6 @@ namespace TypoZap
     
     public class AppSettings
     {
-        public bool StartWithWindows { get; set; } = false;
-        public bool MinimizeToTray { get; set; } = true;
         public string SelectedTone { get; set; } = "default";
         public DateTime LastModified { get; set; } = DateTime.Now;
     }

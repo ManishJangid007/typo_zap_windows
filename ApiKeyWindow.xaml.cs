@@ -22,33 +22,6 @@ namespace TypoZap
             ApiKeyTextBox.SelectAll();
         }
         
-        private void PasteButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (WinForms.Clipboard.ContainsText())
-                {
-                    var clipboardText = WinForms.Clipboard.GetText().Trim();
-                    if (!string.IsNullOrEmpty(clipboardText))
-                    {
-                        ApiKeyTextBox.Text = clipboardText;
-                        ShowStatus("API key pasted from clipboard", true);
-                    }
-                    else
-                    {
-                        ShowStatus("Clipboard is empty or contains only whitespace", false);
-                    }
-                }
-                else
-                {
-                    ShowStatus("No text found in clipboard", false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowStatus($"Error pasting from clipboard: {ex.Message}", false);
-            }
-        }
         
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -127,6 +100,24 @@ namespace TypoZap
                 timer.Stop();
             };
             timer.Start();
+        }
+        
+        private void CreditsLink_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                // Open the GitHub repository in the default browser
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/ManishJangid007/typo_zap_windows",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                WinForms.MessageBox.Show($"Error opening browser: {ex.Message}", "Error", 
+                    WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Warning);
+            }
         }
     }
 }
