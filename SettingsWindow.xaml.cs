@@ -121,7 +121,8 @@ namespace TypoZap
 
         private void ApplySettingsToUI()
         {
-            // Advanced settings removed - no UI elements to apply
+            // Update hotkey display
+            CurrentHotkeyTextBlock.Text = _currentSettings.CustomHotkey;
         }
         
         private void SaveSettings()
@@ -138,6 +139,10 @@ namespace TypoZap
                 
                 // Save to file
                 File.WriteAllText(_settingsPath, encryptedJson);
+                
+                // Re-register hotkey with new settings
+                var app = (App)System.Windows.Application.Current;
+                app.ReRegisterHotkey();
                 
                 WinForms.MessageBox.Show("Settings saved successfully!", "Success", 
                     WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Information);
@@ -218,6 +223,43 @@ namespace TypoZap
             }
         }
         
+        private void RecordHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var hotkeyWindow = new HotkeyRecordingWindow();
+            hotkeyWindow.HotkeyRecorded += (hotkey) =>
+            {
+                _currentSettings.CustomHotkey = hotkey;
+                CurrentHotkeyTextBlock.Text = hotkey;
+                
+                // Immediately apply the new hotkey
+                var app = (App)System.Windows.Application.Current;
+                app.ReRegisterHotkey();
+                
+                WinForms.MessageBox.Show($"Hotkey recorded: {hotkey}\n\nSave settings to use the new hotkey.", 
+                    "Hotkey Recorded", WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Information);
+            };
+            hotkeyWindow.ShowDialog();
+        }
+        
+        private void ResetHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = WinForms.MessageBox.Show(
+                "Reset hotkey to default (Ctrl+Alt+Q)?",
+                "Reset Hotkey",
+                WinForms.MessageBoxButtons.YesNo,
+                WinForms.MessageBoxIcon.Question);
+                
+            if (result == WinForms.DialogResult.Yes)
+            {
+                _currentSettings.CustomHotkey = "Ctrl+Alt+Q";
+                CurrentHotkeyTextBlock.Text = "Ctrl+Alt+Q";
+                
+                // Immediately apply the default hotkey
+                var app = (App)System.Windows.Application.Current;
+                app.ReRegisterHotkey();
+            }
+        }
+        
         
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -231,11 +273,5 @@ namespace TypoZap
             DialogResult = false;
             Close();
         }
-    }
-    
-    public class AppSettings
-    {
-        public string SelectedTone { get; set; } = "default";
-        public DateTime LastModified { get; set; } = DateTime.Now;
     }
 }

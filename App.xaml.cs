@@ -56,9 +56,6 @@ namespace TypoZap
 
                 // Load and apply the selected tone
                 LoadAndApplySelectedTone();
-
-                // Show startup notification
-                ShowNotification("TypoZap Started", "1. Select text anywhere\n2. Press Ctrl+Alt+Q\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
@@ -458,24 +455,88 @@ namespace TypoZap
                 if (_mainWindow != null && _hotkeyManager != null)
                 {
                     Console.WriteLine("🔑 Attempting to register hotkey...");
-                    var success = _hotkeyManager.RegisterHotkey(_mainWindow);
+                    
+                    // Load custom hotkey from settings
+                    var customHotkey = LoadCustomHotkeyFromSettings();
+                    var success = _hotkeyManager.RegisterHotkey(_mainWindow, customHotkey);
+                    
                     if (success)
                     {
-                        Console.WriteLine("✅ Hotkey registration completed successfully");
+                        Console.WriteLine($"✅ Hotkey '{customHotkey}' registration completed successfully");
                     }
                     else
                     {
-                        Console.WriteLine("❌ Hotkey registration failed");
+                        Console.WriteLine($"❌ Hotkey '{customHotkey}' registration failed, falling back to default");
+                        // Fallback to default hotkey
+                        _hotkeyManager.RegisterHotkey(_mainWindow, "Ctrl+Alt+Q");
                     }
+                    
+                    // Show startup notification with current hotkey
+                    var currentHotkey = _hotkeyManager.GetCurrentHotkey();
+                    ShowNotification("TypoZap Started", $"1. Select text anywhere\n2. Press {currentHotkey}\n3. Text automatically corrected!", WinForms.ToolTipIcon.Info);
                 }
             };
             
             timer.Start();
         }
+        
+        private string LoadCustomHotkeyFromSettings()
+        {
+            try
+            {
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var settingsPath = Path.Combine(appDataPath, "TypoZap", "settings.json");
+                
+                if (File.Exists(settingsPath))
+                {
+                    var encryptedJson = File.ReadAllText(settingsPath);
+                    var decryptedJson = DecryptSettings(encryptedJson);
+                    var settings = Newtonsoft.Json.JsonConvert.DeserializeObject<AppSettings>(decryptedJson);
+                    
+                    if (settings != null && !string.IsNullOrEmpty(settings.CustomHotkey))
+                    {
+                        Console.WriteLine($"🎨 Custom hotkey loaded: {settings.CustomHotkey}");
+                        return settings.CustomHotkey;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error loading custom hotkey: {ex.Message}");
+            }
+            
+            return "Ctrl+Alt+Q"; // Default hotkey
+        }
 
         public void ProcessHotkeyMessage(int message, IntPtr wParam, IntPtr lParam)
         {
             _hotkeyManager?.ProcessHotkeyMessage(message, wParam, lParam);
+        }
+        
+        public void ReRegisterHotkey()
+        {
+            if (_mainWindow != null && _hotkeyManager != null)
+            {
+                Console.WriteLine("🔄 Re-registering hotkey after settings change...");
+                
+                // Unregister current hotkey first
+                _hotkeyManager.UnregisterHotkey(_mainWindow);
+                
+                // Load custom hotkey from settings
+                var customHotkey = LoadCustomHotkeyFromSettings();
+                var success = _hotkeyManager.RegisterHotkey(_mainWindow, customHotkey);
+                
+                if (success)
+                {
+                    Console.WriteLine($"✅ Hotkey '{customHotkey}' re-registration completed successfully");
+                }
+                else
+                {
+                    Console.WriteLine($"❌ Hotkey '{customHotkey}' re-registration failed, falling back to default");
+                    // Fallback to default hotkey
+                    _hotkeyManager.RegisterHotkey(_mainWindow, "Ctrl+Alt+Q");
+                }
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -484,5 +545,12 @@ namespace TypoZap
             _notifyIcon?.Dispose();
             base.OnExit(e);
         }
+    }
+    
+    public class AppSettings
+    {
+        public string SelectedTone { get; set; } = "default";
+        public string CustomHotkey { get; set; } = "Ctrl+Alt+Q";
+        public DateTime LastModified { get; set; } = DateTime.Now;
     }
 }
