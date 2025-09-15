@@ -5,6 +5,12 @@ All notable changes to TypoZap will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-09-15
+
+### 🐛 Fixed
+
+- **Clipboard Copy Issue**: Fixed a bug where the application would fail to copy text if the text was already in the clipboard, which commonly occurs after pasting text.
+
 ## [1.2.0] - 2025-01-27
 
 ### 🎉 Major Update - Custom Hotkeys & Enhanced UI

@@ -175,7 +175,10 @@ namespace TypoZap
                 // Step 1: Store original clipboard content to restore later
                 Console.WriteLine("📋 Storing original clipboard content...");
                 originalClipboard = _clipboardManager?.GetClipboardText();
-                Console.WriteLine($"📋 Original clipboard: '{originalClipboard?.Substring(0, Math.Min(50, originalClipboard?.Length ?? 0))}...'");
+                Console.WriteLine($"📋 Original clipboard: '{originalClipboard?.Substring(0, Math.Min(50, originalClipboard?.Length ?? 0))}'...");
+                
+                // Clear the clipboard before copying
+                _clipboardManager?.ClearClipboard();
                 
                 // Step 2: Automatically copy selected text (simulate Ctrl+C)
                 Console.WriteLine("📋 Automatically copying selected text...");
@@ -191,7 +194,7 @@ namespace TypoZap
                 Console.WriteLine($"📋 Selected text: '{selectedText}'");
 
                 // Step 5: Check if we got new text - if not, try fallback method for Teams/Electron apps
-                if (string.IsNullOrWhiteSpace(selectedText) || selectedText == originalClipboard)
+                if (string.IsNullOrWhiteSpace(selectedText))
                 {
                     Console.WriteLine("🔄 Standard copy failed, trying fallback method for Teams/Electron apps...");
                     
@@ -206,7 +209,7 @@ namespace TypoZap
                     Console.WriteLine($"📋 Fallback attempt - Selected text: '{selectedText}'");
                     
                     // If still no luck, give up
-                    if (string.IsNullOrWhiteSpace(selectedText) || selectedText == originalClipboard)
+                    if (string.IsNullOrWhiteSpace(selectedText))
                     {
                         // Restore original clipboard if no new text was selected
                         if (!string.IsNullOrEmpty(originalClipboard))
